@@ -1,0 +1,366 @@
+\documentclass[10pt]{beamer}
+
+\usepackage[spanish, mexico]{babel}
+\usepackage[utf8]{inputenc}
+
+\usetheme[progressbar=frametitle]{metropolis}
+\usepackage{appendixnumberbeamer}
+
+\usepackage{booktabs}
+\usepackage[scale=2]{ccicons}
+
+\usepackage{pgfplots}
+\usepgfplotslibrary{dateplot}
+
+\usepackage{xspace}
+\newcommand{\themename}{\textbf{\textsc{metropolis}}\xspace}
+
+%%
+\usepackage{color}
+\definecolor{lstgrey}{rgb}{0.95,0.95,0.95}
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+
+\usepackage{listings}
+\lstset{language=Python,
+       backgroundcolor=\color{lstgrey},
+       frame=single,
+       basicstyle=\footnotesize\ttfamily,
+       captionpos=b,
+       tabsize=2,
+  }
+
+\lstset{language=Python,%
+  %basicstyle=\color{red},
+  breaklines=true,%
+  morekeywords={python2tikz},
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+  identifierstyle=\color{black},%
+  stringstyle=\color{mylilas},
+  commentstyle=\color{mygreen},%
+  showstringspaces=false,%without this there will be a symbol in the places where there is a space
+  numbers=left,%
+  numberstyle={\tiny \color{black}},% size of the numbers
+  numbersep=9pt, % this defines how far the numbers are from the text
+  emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+  %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+}
+%
+
+\lstset{language=C,
+       backgroundcolor=\color{lstgrey},
+       frame=single,
+       basicstyle=\footnotesize\ttfamily,
+       captionpos=b,
+       tabsize=2,
+  }
+
+\lstset{language=C,%
+  %basicstyle=\color{red},
+  breaklines=true,%
+  morekeywords={c2tikz},
+  keywordstyle=\color{blue},%
+  morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+  identifierstyle=\color{black},%
+  stringstyle=\color{mylilas},
+  commentstyle=\color{mygreen},%
+  showstringspaces=false,%without this there will be a symbol in the places where there is a space
+  numbers=left,%
+  numberstyle={\tiny \color{black}},% size of the numbers
+  numbersep=9pt, % this defines how far the numbers are from the text
+  emph=[1]{for,end,break},emphstyle=[1]\color{red}, %some words to emphasise
+  %emph=[2]{word1,word2}, emphstyle=[2]{style},    
+}
+%
+
+\title{Algoritmos de búsqueda}
+\subtitle{Práctica de Laboratorio}
+\date{\today}
+% \date{}
+\author{Ing. Jose Eduardo Laruta Espejo}
+\institute{Universidad La Salle}
+% \titlegraphic{\hfill\includegraphics[height=1.5cm]{../img/lasalle}}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}[allowframebreaks]{Contenido}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[]
+\end{frame}
+
+
+\section{Introducción}
+\begin{frame}[fragile]{Introducción}
+Este laboratorio tiene como objetivo el de implementar los algoritmos de búsqueda de árboles 
+implementados en un entorno de un videojuego.
+
+Pacman debe encontrar el camino a través de distintos laberintos para llegar a un lugar en 
+particular y recolectar comida eficientemente.
+
+El archivo con lo necesario se encuentra en \href{https://inst.eecs.berkeley.edu/~cs188/fa18/assets/files/tutorial.zip}{este link}
+\end{frame}
+
+\begin{frame}{Introducción}
+Al igual que en la anterior práctica de laboratorio, esta práctica cuenta con un programa autoevaluador
+para comprobar la efectividad y correcta implementación de los algoritmos.
+
+Las prácticas consisten en implementar algunas funciones en los siguientes archivos de código fuente:
+\begin{itemize}
+    \item \texttt{search.py}: Archivo donde se deben implementar todos los algoritmos de búsqueda.
+    \item \texttt{searchAgents.py}: Archivo donde se deben implementar detalles acerca de los agentes.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Introducción}
+Por su parte, resultará útil estudiar los siguientes archivos (no editar):
+\begin{itemize}
+    \item \texttt{util.py}: Estructuras de datos útiles para implementar los algoritmos.
+    \item \texttt{pacman.py}: Archivo que describe el estado del juego de pacman.
+    \item \texttt{game.py}: Contiene la lógica de todo el mundo de Pacman.
+\end{itemize}
+\end{frame}
+
+
+\subsection{Bienvenido a pacman!}
+
+\begin{frame}[fragile]{Bienvenido a Pacman}
+    Luego de descargar el fichero comprimido, descomprimir e ingresar a la carpeta correspondiente. 
+Se puede correr el juego usando: \texttt{python pacman.py}.
+
+El agente más simple implementado en \texttt{searchAgents.py} se llama \texttt{GoWestAgent} y siempre 
+se dirige hacia el oeste (un agente reflejo trivial). 
+
+\begin{lstlisting}
+$ python pacman.py --layout testMaze --pacman GoWestAgent
+$ python pacman.py --layout tinyMaze --pacman GoWestAgent
+\end{lstlisting}
+
+La opción \texttt{-l} o \texttt{--layout} se puede usar para seleccionar el mapa.
+
+\textbf{Nota.} Todos los comandos usados se pueden encontrar en el archivo \texttt{commands.txt}
+\end{frame}
+
+
+\section{DFS}
+
+\begin{frame}[fragile]{Ejercicio 1(3 puntos): Encontrando un punto fijo usando DFS}
+En el archivo \texttt{searchAgents.py} se puede encontrar un agente (\texttt{SearchAgent}) 
+completamente implementado que planifica un camino a través del mapa y ejecuta el plan paso 
+a paso. Los algoritmos para encontrar este plan no han sido implementados.
+
+Primero, pruebe que el agente funciona correctamente con el siguiente comando:
+
+\begin{lstlisting}
+$ python pacman.py -l tinyMaze -p SearchAgent -a fn=tinyMazeSearch
+\end{lstlisting}
+
+El anterior comando le dice al \texttt{SearchAgent} que use \texttt{tinyMazeSearch} como 
+su algoritmo de búsqueda que esta implementado en \texttt{search.py}.
+\end{frame}
+
+\begin{frame}[fragile]{Ejercicio 1(3 puntos): Pseudo código}
+A continuación se muestra pseudo código para implementar un algoritmo de búsqueda de 
+grafos\footnote{La búsqueda de grafos, a diferencia de la búsqueda de árboles, ignora los 
+nodos de los estados anteriormente visitados.}.
+\begin{lstlisting}
+def busqueda_grafo(problema, frontera) return solucion
+    cerrados <- conjunto vacio
+    frontera <- insertar(nodo(estado_inicial))
+    loop:
+        if fontera esta vacia: return falla
+        nodo <- REMOVER_DE_FRONTERA(frontera)
+        if ES_OBJETIVO(problema, estado(nodo)): 
+            retornar camino
+        if estado(nodo) no esta en cerrados:
+            AGREGAR estado(nodo) a cerrados
+            for nodos_hijos en EXPANDIR(nodo):
+                frontera <- INSERTAR(nodo_hijo, frontera)
+            end
+    end
+\end{lstlisting}
+    
+\end{frame}
+
+\begin{frame}[fragile]{Ejercicio 1(3 puntos): DFS}
+Implemente el algoritmos de búsqueda por profundidad DFS en la función \texttt{depthFirstSearch} 
+en el archivo \texttt{search.py} con las siguientes consideraciones:
+
+\begin{itemize}
+    \item La función debe retornar una \textbf{lista de acciones} que llevarán al agente desde 
+    el inicio al objetivo, las acciones deben ser válidas.
+    \item Asegúrese de usar las estructuras de datos proveídas en \texttt{util.py}.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ejercicio 1(3 puntos): DFS}
+Para probar el funcionamiento correcto de su algoritmo use los siguientes comandos 
+con distintos mapas:
+
+\begin{lstlisting}
+$ python pacman.py -l tinyMaze -p SearchAgent
+$ python pacman.py -l mediumMaze -p SearchAgent
+$ python pacman.py -l bigMaze -z .5 -p SearchAgent
+\end{lstlisting}
+
+Se podrá visualizar una capa de color rojo sobre el mapa luego de realizar la búsqueda con 
+el orden en el que cada nodo fue explorado (rojo claro significa expansión más pronta).
+
+Use las funciones definidas en los comentarios para probar los datos que se usarán en el problema.
+\end{frame}
+
+\section{BFS}
+\begin{frame}[fragile]{Ejercicio 2(3 puntos): BFS}
+Implemente búsqueda en anchura BFS en la función \texttt{breadthFirstSearch}. Para probar 
+el funcionamiento de su algoritmo puede especificar el algoritmo usando la opción \texttt{-a fn=bfs}:
+
+\begin{lstlisting}
+$ python pacman.py -l mediumMaze -p SearchAgent -a fn=bfs
+$ python pacman.py -l bigMaze -p SearchAgent -a fn=bfs -z .5
+\end{lstlisting}
+
+BFS encuentra la solución más corta?
+
+Si su función ha sido implementada de forma genérica puede usarla también en el problema del 
+rompecabezas de piezas deslizantes usando: \texttt{python eightpuzzle.py}.
+\end{frame}
+
+\section{UCS}
+
+\begin{frame}[fragile]{Ejercicio 3(3 puntos): UCS}
+BFS es capaz de encontrar la solución más corta pero usualmente se debe considerar otros 
+aspectos como el costo de las transiciones entre nodos. Considere los siguientes mapas:
+\texttt{mediumDottedMaze} y \texttt{mediumScaryMaze}.
+
+Cambiando la función de costo, se puede aconsejar a Pacman a encontrar distintos caminos. Por 
+ejemplo para evitar lugares peligrosos o dirigirse a áreas con más comida, un agente Pacman racional
+debería tomar en cuenta estas consideraciones.
+
+\end{frame}
+
+\begin{frame}[fragile]{Ejercicio 3(3 puntos): UCS}
+Implemente búsqueda de costo uniforme UCS en la función \texttt{uniformCostSearch}. Para probar 
+el funcionamiento de su algoritmo puede especificar el algoritmo usando la opción \texttt{-a fn=ucs}. 
+Suy algoritmo debería comportarse adecuadamente en los siguientes 3 mapas\footnote{Los agentes y las 
+funciones de costo para los dos últimos mapas han sido implementadas y no debe modificar nada para correr 
+las simulaciones.}:
+
+\begin{lstlisting}
+$ python pacman.py -l mediumMaze -p SearchAgent -a fn=ucs
+$ python pacman.py -l mediumDottedMaze -p StayEastSearchAgent
+$ python pacman.py -l mediumScaryMaze -p StayWestSearchAgent
+\end{lstlisting}
+
+\end{frame}
+
+\section{A*}
+\begin{frame}[fragile]{Ejercicio 4(3 puntos): A*}
+Implemente A* en la función \texttt{uniformCostSearch}. A* toma una función heurística como 
+argumento. Las heurísticas tienen 2 argumentos: el estado del problema y el mismo problema.
+
+Para un ejemplo, puede referirse a la función heurística trivial \texttt{nullHeuristic} en
+\texttt{search.py}.
+
+Puede probar su implementación del A* en los mismos mapas de DFS y BFS usando la heurística 
+de la \textit{distancia de Manhattan} (implementación disponible en la función \texttt{manhattanHeuristic}
+en \texttt{searchAgents.py})
+
+\begin{lstlisting}
+$ python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+\end{lstlisting}
+
+\end{frame}
+
+
+\section{Visitar Esquinas: Representación}
+\section{Visitar Esquinas: Heurística}
+\section{Comer todo: Heurística}
+\section{Búsqueda subóptima}
+
+
+
+\begin{frame}[fragile,allowframebreaks]{Instrucciones}
+Una vez descargado el archivo, descomprimir el contenido en alguna carpeta destinada a 
+proyectos de programación. dentro de la carpeta encontrará varios archivos de python.
+
+Para este Laboratorio, se tienen un conjunto de archivos que deberán editar:
+\begin{itemize}
+    \item \texttt{addition.py}: ejercicio 1
+    \item \texttt{buyLotsOfFruit.py}: ejercicio 2
+    \item \texttt{shop.py}: ejercicio 3
+    \item \texttt{shopSmart.py}: ejercicio 3
+\end{itemize}
+Una vez editados los archivos correspondientes a los ejercicios, deberá ejecutar el autoevaluador 
+para comprobar la solución.
+
+El archivo para evaluar los ejercicios se llama \texttt{autograder.py}
+
+Para ejecutar la evaluación de los ejercicios:
+\begin{lstlisting}
+$ python autograder.py
+\end{lstlisting}
+Los archivos restantes se pueden ignorar, no los toque.
+
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{Ejercicio 1 (ejemplo)}
+Abrir el archivo \texttt{addition.py} y ver la definición de \texttt{add}:
+\begin{lstlisting}
+def add(a, b):
+    "Return the sum of a and b"
+    "*** YOUR CODE HERE ***"
+    return 0
+\end{lstlisting}
+Modificar de la siguiente manera:
+\begin{lstlisting}
+def add(a, b):
+    "Retorna la suma de a y b"
+    print('a={}, b={}, retornando a+b={}'.format(a,b,a+b))
+    return a+b
+\end{lstlisting}
+Correr a evaluacion:
+\begin{lstlisting}
+$ python autograder.py -q q1
+\end{lstlisting}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Ejercicio 2}
+Añadir una función llamada \texttt{buyLotsOfFruit(orderList)} al archivo \texttt{buyLotsOfFruit.py}
+que tome como parámetro una lista de tuplas \texttt{(fruta, kilo)} y retorne el costo 
+de la lista. Si aparece una fruta en la lista que no este presente en \texttt{fruitPrices} se debe 
+imprimir un mensaje de error y retornar \texttt{None}. 
+
+No cambie la variable \texttt{fruitPrices}
+\end{frame}
+
+\begin{frame}[fragile]{Ejercicio 3}
+Complete la función \texttt{shopSmart(orders,shops)} en el archivo \texttt{shopSmart.py}
+que recibe un \texttt{orderList} (similar al del anterior ejercicio) y una lista 
+de objetos \texttt{FruitShop} y retorne el objeto \texttt{FruitShop} que posea el menor costo 
+total. No cambie los nombres de archivos o de variables.
+
+Compruebe el funcionamiento usando el archivo de evaluación \texttt{autograder.py}
+
+\end{frame}
+
+\appendix
+
+% \begin{frame}[fragile]{Backup slides}
+%   Sometimes, it is useful to add slides at the end of your presentation to
+%   refer to during audience questions.
+
+%   The best way to do this is to include the \verb|appendixnumberbeamer|
+%   package in your preamble and call \verb|\appendix| before your backup slides.
+
+%   \themename will automatically turn off slide numbering and progress bars for
+%   slides in the appendix.
+% \end{frame}
+
+
+\end{document}
