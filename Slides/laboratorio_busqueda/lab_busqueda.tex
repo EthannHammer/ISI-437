@@ -277,75 +277,106 @@ $ python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhatt
 
 
 \section{Visitar Esquinas: Representación}
+
+\begin{frame}[fragile]{Ejercicio 5(3 puntos): Visitar esquinas}
+Se procederá a formular un nuevo problema diseñando la función heurística.
+
+En ciertos mapas, existen 4 puntos de comida, uno en cada esquina. El 
+nuevo problema de búsqueda consiste en encontrar el camino más corto 
+a través del mapa que visite las 4 esquinas.
+
+\textbf{Nota:} Asegúrese de haber completado el ejercicio 2 antes.
+
+Implemente el problema \texttt{CornersProblem} en el archivo \texttt{searchAgents}.
+Se necesita elegir una representación de estado que codifique la información necesaria 
+para detectar las 4 esquinas y cuándo han sido visitadas. El agente debería poder resolver:
+
+\begin{lstlisting}
+$ python pacman.py -l tinyCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+$ python pacman.py -l mediumCorners -p SearchAgent -a fn=bfs,prob=CornersProblem
+\end{lstlisting}
+
+\end{frame}
+
+\begin{frame}[fragile]{Ejercicio 5(3 puntos): Visitar esquinas}
+Para recibir la nota completa se debe definir una representación abstracta 
+del estado que no codifique información irrelevante al problema (posición de fantasmas, comida extra, etc.). 
+En particular, no use \texttt{GameState} como estado en la búsqueda, el algoritmo resultante 
+será demasiado lento.
+
+\textbf{Pista:} Las únicas partes del estado del juego que necesita referenciar en su implementación 
+son la posición de Pacman y la ubicación de las 4 esquinas.
+
+\end{frame}
 \section{Visitar Esquinas: Heurística}
+
+
+\begin{frame}[fragile]{Ejercicio 6(3 puntos): Visitar esquinas (Heurística)}
+Implemente una heurística no trivial consistente y admisible para \texttt{CornersProblem} 
+en la función \texttt{cornersHeuristic}.
+
+Pruebe el funcionamiento con:
+
+\begin{lstlisting}
+$ python pacman.py -l mediumCorners -p AStarCornersAgent -z 0.5
+\end{lstlisting}
+
+\end{frame}
 \section{Comer todo: Heurística}
+
+
+\begin{frame}[fragile]{Ejercicio 7(4 puntos): Comer todo}
+Para este problema ya se cuenta con una definición en \texttt{FoodSearchProblem} 
+in \texttt{searchAgents.py}. Una solución se define como el camino que 
+recolecte toda la comida disponible en el mapa. Si ha implementado correctamente 
+A*, el siguiente test debería resultar exitoso:
+
+\begin{lstlisting}
+$ python pacman.py -l testSearch -p AStarFoodSearchAgent
+\end{lstlisting}
+
+\textbf{Nota:} Asegúrese de haber completado exitosamente el ejercicio 4 
+antes de implementar el ejercicio 7.
+
+\end{frame}
+
+\begin{frame}[fragile]{Ejercicio 7(4 puntos): Comer todo}
+Implemente una función heurística en \texttt{foodheuristic} en el 
+archivo \texttt{searchAgents.py} que cumpla con las condiciones de 
+admisibilidad y consistencia para el problema \texttt{FoodSearchProblem}.
+
+Pruebe la implementación con su agente usando:
+
+\begin{lstlisting}
+$ python pacman.py -l trickySearch -p AStarFoodSearchAgent
+\end{lstlisting}
+
+\textbf{Nota:} La función heurística debe cumplir con los requisitos 
+de consistencia y admisibilidad, caso contrario no se otorgarán puntos. Además,
+mientras menos iteraciones tome la búsqueda más puntos podrá obtener.
+
+\end{frame}
+
 \section{Búsqueda subóptima}
 
+\begin{frame}[fragile]{Ejercicio 8(3 puntos): Búsqueda subóptima}
+A veces, incluso con A* y una buena heurística, encontrar el camino 
+óptimo para recoger toda la comida es complicado. En estos casos se 
+requiere un camino razonablemente bueno de manera rápida. Se deberá implementar 
+un agente que siempre vaya a la comida más cercana.
 
+\texttt{ClosestDotSearchAgent} está implementada en \texttt{searchAgents.py}, pero 
+le falta una función clave para encontrar el camino a la comida más cercana.
 
-\begin{frame}[fragile,allowframebreaks]{Instrucciones}
-Una vez descargado el archivo, descomprimir el contenido en alguna carpeta destinada a 
-proyectos de programación. dentro de la carpeta encontrará varios archivos de python.
+Implemente la función \texttt{findPathToClosestDot} en \texttt{searchAgents.py}. 
 
-Para este Laboratorio, se tienen un conjunto de archivos que deberán editar:
-\begin{itemize}
-    \item \texttt{addition.py}: ejercicio 1
-    \item \texttt{buyLotsOfFruit.py}: ejercicio 2
-    \item \texttt{shop.py}: ejercicio 3
-    \item \texttt{shopSmart.py}: ejercicio 3
-\end{itemize}
-Una vez editados los archivos correspondientes a los ejercicios, deberá ejecutar el autoevaluador 
-para comprobar la solución.
-
-El archivo para evaluar los ejercicios se llama \texttt{autograder.py}
-
-Para ejecutar la evaluación de los ejercicios:
 \begin{lstlisting}
-$ python autograder.py
+$ python pacman.py -l bigSearch -p ClosestDotSearchAgent -z .5
 \end{lstlisting}
-Los archivos restantes se pueden ignorar, no los toque.
 
-\end{frame}
-
-\begin{frame}[fragile,allowframebreaks]{Ejercicio 1 (ejemplo)}
-Abrir el archivo \texttt{addition.py} y ver la definición de \texttt{add}:
-\begin{lstlisting}
-def add(a, b):
-    "Return the sum of a and b"
-    "*** YOUR CODE HERE ***"
-    return 0
-\end{lstlisting}
-Modificar de la siguiente manera:
-\begin{lstlisting}
-def add(a, b):
-    "Retorna la suma de a y b"
-    print('a={}, b={}, retornando a+b={}'.format(a,b,a+b))
-    return a+b
-\end{lstlisting}
-Correr a evaluacion:
-\begin{lstlisting}
-$ python autograder.py -q q1
-\end{lstlisting}
-\end{frame}
-
-
-
-\begin{frame}[fragile]{Ejercicio 2}
-Añadir una función llamada \texttt{buyLotsOfFruit(orderList)} al archivo \texttt{buyLotsOfFruit.py}
-que tome como parámetro una lista de tuplas \texttt{(fruta, kilo)} y retorne el costo 
-de la lista. Si aparece una fruta en la lista que no este presente en \texttt{fruitPrices} se debe 
-imprimir un mensaje de error y retornar \texttt{None}. 
-
-No cambie la variable \texttt{fruitPrices}
-\end{frame}
-
-\begin{frame}[fragile]{Ejercicio 3}
-Complete la función \texttt{shopSmart(orders,shops)} en el archivo \texttt{shopSmart.py}
-que recibe un \texttt{orderList} (similar al del anterior ejercicio) y una lista 
-de objetos \texttt{FruitShop} y retorne el objeto \texttt{FruitShop} que posea el menor costo 
-total. No cambie los nombres de archivos o de variables.
-
-Compruebe el funcionamiento usando el archivo de evaluación \texttt{autograder.py}
+\textbf{Nota:} Debe completar \texttt{AnyFoodSearchProblem} con el 
+test objetivo y luego resolver el problema con una función de búsqueda apropiada. 
+La solución debería ser bastante corta.
 
 \end{frame}
 
