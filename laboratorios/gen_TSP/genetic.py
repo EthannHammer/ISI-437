@@ -103,6 +103,8 @@ def orderOneCrossover(parent1, parent2):
         parent1: candidato 1, una lista con una permutación de ids de ciudades, por ejemplo, 
                 para un problema con 4 ciudades, un candidato podría ser: [3,1,0,2]
         parent2: otro candidato
+            v     v
+        [2, 4, 1, 0, 3] [0, 3, 2, 4, 1] => [ 2, 4, 1, 0, 3]
 
     Esta función debe retornar un nuevo candidato hijo producto del crossover de los padres.
 
@@ -165,45 +167,29 @@ def nextOffspring(population, crossover=orderOneCrossover, elitism=0.0):
     return elite_candidates + offspring
 
 def insertMutation(candidate):
-    '''
-    ---> Ejercicio 3 <----
-    Implementar la mutación insert.
-
-    Usted debe implementar esta funcion para realizar la operación de la mutación insert.
-
-    Esta función recibe una solución candidato de la misma forma anteriormente explicada.
-
-    Esta función debe retornar un nuevo candidato con la mutación aplicada.
-
-    Procedimiento. 
-    La mutación insert sigue los siguientes pasos:
-        1. encontrar 2 elementos aleatorios del candidato.
-        2. insertar el 2do elemento a continuación del primer elemento.
-    
-    Importante: El orden de los elementos no modificados debe mantenerse así como el tamaño del candidato.
-    '''
-    new_candidate = candidate.copy()
+    print('mutacion insert')
+    print(f'candidato entrante: {candidate}')
+    new_candidate = candidate.copy()                # [3, 6, 2, 1, 7, 4, 8, 0, 5]
+    i1 = random.randint(0, len(candidate) - 1)      # 3  c[3] => 1
+    i2 = random.randint(i1, len(candidate) - 1)     # 6  c[6] => 8
+    second = candidate[i2]          # 8
+    # remove and insert the second after the first
+    new_candidate.remove(second)                    # [3, 6, 2, 1, 7, 4, 0, 5]
+    new_candidate.insert(i1 + 1, second)            # [3, 6, 2, 1, 8, 7, 4, 0, 5]
+    print(f'candidato mutante: {new_candidate}')
     return new_candidate
 
 def swapMutation(candidate):
-    '''
-    ---> Ejercicio 3 <----
-    Implementar la mutación swap.
-
-    Usted debe implementar esta funcion para realizar la operación de la mutación swap.
-
-    Esta función recibe una solución candidato de la misma forma anteriormente explicada.
-
-    Esta función debe retornar un nuevo candidato con la mutación aplicada.
-
-    Procedimiento. 
-    La mutación insert sigue los siguientes pasos:
-        1. encontrar 2 elementos aleatorios del candidato.
-        2. intercambiar los elementos en la lista.
-    
-    Importante: El orden de los elementos no modificados debe mantenerse así como el tamaño del candidato.
-    '''
-    new_candidate = candidate.copy()
+    print('mutacion swap')
+    print(f'candidato entrante: {candidate}')
+    new_candidate = candidate.copy()                # [3, 6, 2, 1, 7, 4, 8, 0, 5]
+    i1 = random.randint(0, len(candidate) - 1)      # i1 = 2 c[2] = 2
+    i2 = random.randint(i1, len(candidate) - 1)     # i2 = 5 c[5] = 4
+    # swap the 2 elements
+    aux = new_candidate[i1]                         # aux = 2
+    new_candidate[i1] = new_candidate[i2]           # [3, 6, 4, 1, 7, 4, 8, 0, 5]
+    new_candidate[i2] = aux                         # [3, 6, 4, 1, 7, 2, 8, 0, 5]
+    print(f'candidato mutante: {new_candidate}')
     return new_candidate
 
 def mutate(population, mutation=swapMutation, prob=0.10):
