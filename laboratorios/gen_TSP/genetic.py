@@ -150,12 +150,12 @@ def orderOneCrossover(parent1, parent2):
     # hallar indices del primer padre
     start = random.randint(0, p_size - 1)
     end = random.randint(start, p_size - 1)     
-    # insertar segmento en el hijo
+    # insertar
     child[start:end + 1] = parent1[start:end + 1]
-    # crear una lista de elementos restantes para iterar
+    # find remaining indexes to fill with genes of parent 2
     remaining = list(range(end + 1, len(parent1))) + list(range(start))
     parent2_r = parent2[end + 1:] + parent2[:end + 1]
-    # completar elementos restantes en orden
+    # fill in order
     for r in remaining:
         for g in parent2_r:
             if g not in child:
