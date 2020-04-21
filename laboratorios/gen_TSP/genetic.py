@@ -88,7 +88,30 @@ def selectRanking(population, cities):
         - obtenga una nueva lista ordenada en forma descendente donde el primer elemento es el candidato más fuerte 
         o con valor de fitness mayor, y el último es el candidato más debil.
     '''
-    new_generation = population.copy()
+    # hace una copia de la poblacion
+    pop = population.copy()
+    # ordena en forma descendente
+    # Se usa el argumento key invocando una funcion lambda
+    # que llama a la funcion fitness, se debe usar la funcion lambda
+    # ya que la funcion fitness requiere un argumento adicional 
+    # que es la lista de ciudades, cities.
+    pop.sort(reverse=True, key=lambda c: fitness(c, cities))
+    
+    # crea un ranking para los candidatos
+    # estas operaciones asigna la cantidad de candidatos
+    # mas fuertes para que se repliquen y los mas debiles 
+    # se eliminen en la siguiente generacion
+    rank = range(len(pop), 0, -1)
+    valor_total = sum(rank)
+    porcentajes = [r / valor_total for r in rank]
+    proporcion = [p * len(pop) for p in porcentajes]
+    final = [round(e) for e in proporcion]
+    # Luego de tener el numero de candidatos
+    new_generation = []
+    # Generar los candidatos de acuerdo al numero 
+    for i in range(len(pop)):
+        for r in range(final[i]):
+            new_generation.append(population[i])
     
     return new_generation
 
@@ -120,7 +143,26 @@ def orderOneCrossover(parent1, parent2):
         - use funciones del módulo random para obtener números aleatorios.
         - use slicing de listas para insertar correctamente.
     '''
-    return random.choice((parent1, parent2))
+    # tamanho del padre
+    p_size = len(parent1)
+    # crear lista de elementos vacios
+    child = [None] * p_size
+    # hallar indices del primer padre
+    start = random.randint(0, p_size - 1)
+    end = random.randint(start, p_size - 1)     
+    # insertar segmento en el hijo
+    child[start:end + 1] = parent1[start:end + 1]
+    # crear una lista de elementos restantes para iterar
+    remaining = list(range(end + 1, len(parent1))) + list(range(start))
+    parent2_r = parent2[end + 1:] + parent2[:end + 1]
+    # completar elementos restantes en orden
+    for r in remaining:
+        for g in parent2_r:
+            if g not in child:
+                child[r] = g
+                parent2_r.remove(g)
+                break
+    return child
 
 def nextOffspring(population, crossover=orderOneCrossover, elitism=0.0):
     '''
